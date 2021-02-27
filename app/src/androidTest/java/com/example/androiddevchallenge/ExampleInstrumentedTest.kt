@@ -16,7 +16,11 @@
 package com.example.androiddevchallenge
 
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.example.androiddevchallenge.data.FakePuppyRepository
+import com.example.androiddevchallenge.ui.theme.MyTheme
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -30,9 +34,37 @@ import org.junit.runner.RunWith
 class ExampleInstrumentedTest {
     @get:Rule
     val composeTestRule = createAndroidComposeRule<MainActivity>()
+    private val repository = FakePuppyRepository()
 
     @Test
-    fun sampleTest() {
-        // Add instrumented tests here
+    fun homeScreenTest() {
+        composeTestRule.setContent {
+            MyTheme {
+                MyApp(repository = repository)
+            }
+        }
+        composeTestRule.onNodeWithText(
+            text = repository.getAllPuppyData().first().breed,
+            substring = true
+        ).assertExists()
+    }
+
+    @Test
+    fun detailScreenTest() {
+        composeTestRule.setContent {
+            MyTheme {
+                MyApp(repository = repository)
+            }
+        }
+
+        composeTestRule.onNodeWithText(
+            text = repository.getAllPuppyData().first().breed,
+            substring = true
+        ).performClick()
+
+        composeTestRule.onNodeWithText(
+            text = "Adopt",
+            substring = true
+        ).assertExists()
     }
 }
