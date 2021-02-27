@@ -18,29 +18,33 @@ package com.example.androiddevchallenge
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
+import com.example.androiddevchallenge.data.FakePuppyRepository
+import com.example.androiddevchallenge.data.Repository
+import com.example.androiddevchallenge.ui.NavGraph
 import com.example.androiddevchallenge.ui.theme.MyTheme
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val repository = (application as PuppyApplication).container.repository
         setContent {
             MyTheme {
-                MyApp()
+                MyApp(repository)
             }
         }
     }
 }
 
-// Start building your app here!
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun MyApp() {
+fun MyApp(repository: Repository) {
     Surface(color = MaterialTheme.colors.background) {
-        Text(text = "Ready... Set... GO!")
+        NavGraph(repository = repository)
     }
 }
 
@@ -48,7 +52,7 @@ fun MyApp() {
 @Composable
 fun LightPreview() {
     MyTheme {
-        MyApp()
+        MyApp(FakePuppyRepository())
     }
 }
 
@@ -56,6 +60,6 @@ fun LightPreview() {
 @Composable
 fun DarkPreview() {
     MyTheme(darkTheme = true) {
-        MyApp()
+        MyApp(FakePuppyRepository())
     }
 }
