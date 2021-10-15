@@ -15,31 +15,55 @@
  */
 package com.example.androiddevchallenge.ui.home
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import com.example.androiddevchallenge.data.PuppyData
 import com.example.androiddevchallenge.data.Repository
+import com.example.androiddevchallenge.data.Result
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
-class HomeViewModel(repository: Repository) :
-    ViewModel() {
-    private val _data: MutableLiveData<List<PuppyData>> by lazy {
-        MutableLiveData<List<PuppyData>>().apply {
-            value = repository.getAllPuppyData()
-        }
-    }
-    val data: LiveData<List<PuppyData>> = _data
+data class HomeUiState(
+    val loading: Boolean = false,
+    val puppyData: List<PuppyData> = emptyList(),
+    val error: String = ""
+) {
+    /**
+     * True if this represents a first load
+     */
+    val initialLoad: Boolean
+        get() = puppyData.isEmpty() && error.isEmpty() && loading
 }
 
-class HomeViewModelFactory(
-    private val repository: Repository
-) :
-    ViewModelProvider.Factory {
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(HomeViewModel::class.java)) {
-            return HomeViewModel(repository) as T
+class HomeViewModel(val repository: Repository) :
+    ViewModel() {
+    private val _uiState = MutableStateFlow(HomeUiState(loading = true))
+    val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
+
+    init {
+        fetchPuppyData()
+    }
+
+    private fun fetchPuppyData() {
+        _uiState.update { it.copy(loading = true) }
+        viewModelScope.launch {
+            val result = repository.fetchAllPuppyData()
+            _uiState.update {
+                when (result) {
+                    is Result.Success -> it.copy(puppyData = result.data, loading = false)
+                    is Result.Error -> it.copy(
+                        error = result.exception.localizedMessage,
+                        loading = false
+                    )
+                }
+            }
         }
-        throw IllegalArgumentException("Unknown ViewModel class")
+    }
+
+    fun refresh() {
+        fetchPuppyData()
     }
 }

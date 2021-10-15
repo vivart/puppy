@@ -15,11 +15,14 @@
  */
 package com.example.androiddevchallenge
 
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
-import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.example.androiddevchallenge.data.DataSource
 import com.example.androiddevchallenge.data.FakePuppyRepository
+import com.example.androiddevchallenge.ui.detail.DetailContent
+import com.example.androiddevchallenge.ui.home.HomeContent
 import com.example.androiddevchallenge.ui.theme.MyTheme
 import org.junit.Rule
 import org.junit.Test
@@ -36,15 +39,16 @@ class ExampleInstrumentedTest {
     val composeTestRule = createAndroidComposeRule<MainActivity>()
     private val repository = FakePuppyRepository()
 
+    @ExperimentalAnimationApi
     @Test
     fun homeScreenTest() {
         composeTestRule.setContent {
             MyTheme {
-                MyApp(repository = repository)
+                HomeContent(list = DataSource.data, onNext = {})
             }
         }
         composeTestRule.onNodeWithText(
-            text = repository.getAllPuppyData().first().breed,
+            text = DataSource.data.first().breed,
             substring = true
         ).assertExists()
     }
@@ -53,14 +57,9 @@ class ExampleInstrumentedTest {
     fun detailScreenTest() {
         composeTestRule.setContent {
             MyTheme {
-                MyApp(repository = repository)
+                DetailContent(data = DataSource.data.first())
             }
         }
-
-        composeTestRule.onNodeWithText(
-            text = repository.getAllPuppyData().first().breed,
-            substring = true
-        ).performClick()
 
         composeTestRule.onNodeWithText(
             text = "Adopt",

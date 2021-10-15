@@ -16,11 +16,19 @@
 package com.example.androiddevchallenge
 
 import android.app.Application
+import com.example.androiddevchallenge.di.appModule
+import org.koin.android.ext.koin.androidContext
+import org.koin.android.ext.koin.androidLogger
+import org.koin.core.context.GlobalContext.startKoin
 
 class PuppyApplication : Application() {
-    lateinit var container: AppContainer
     override fun onCreate() {
         super.onCreate()
-        container = AppContainerImpl()
+        // Start Koin
+        startKoin {
+            androidLogger()
+            androidContext(this@PuppyApplication)
+            modules(appModule)
+        }
     }
 }

@@ -15,13 +15,31 @@
  */
 package com.example.androiddevchallenge.data
 
-class FakePuppyRepository : Repository {
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
 
-    override fun getAllPuppyData(): List<PuppyData> {
-        return DataSource.data
-    }
+class FakePuppyRepository : Repository {
+    private var requestCount = 0
+
+    override suspend fun fetchAllPuppyData() = fakeNetworkCall(DataSource.data)
+
+    override suspend fun fetchPuppyData(id: String) =
+        fakeNetworkCall(DataSource.data.first { it.id == id })
 
     override fun getPuppyData(id: String): PuppyData {
         return DataSource.data.first { it.id == id }
     }
+
+    private fun shouldRandomlyFail(): Boolean = ++requestCount % 5 == 0
+
+    private suspend fun <T> fakeNetworkCall(result: T) =
+        withContext(Dispatchers.IO) {
+            delay(800)
+            if (shouldRandomlyFail()) {
+                Result.Error(IllegalStateException())
+            } else {
+                Result.Success(result)
+            }
+        }
 }

@@ -15,11 +15,13 @@
  */
 package com.example.androiddevchallenge.ui.detail
 
+import android.content.res.Configuration
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -34,34 +36,37 @@ import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.ui.tooling.preview.Preview
 import com.example.androiddevchallenge.R
+import com.example.androiddevchallenge.data.DataSource
+import com.example.androiddevchallenge.data.FakePuppyRepository
 import com.example.androiddevchallenge.data.PuppyData
-import com.example.androiddevchallenge.data.Repository
+import com.example.androiddevchallenge.data.Result
+import com.example.androiddevchallenge.ui.components.Loading
+import com.example.androiddevchallenge.ui.theme.MyTheme
+import kotlinx.coroutines.runBlocking
 
 @Composable
 fun DetailScreen(
-    id: String,
-    repository: Repository,
+    detailViewModel: DetailViewModel,
     onBack: () -> Unit,
-    detailViewModel: DetailViewModel = viewModel(factory = DetailViewModelFactory(id, repository))
 ) {
-    val data by detailViewModel.data.observeAsState()
+    val data by detailViewModel.uiState.collectAsState()
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(data?.breed ?: stringResource(R.string.title)) },
+                title = { Text(data.puppyData?.breed ?: stringResource(R.string.title)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(
@@ -73,9 +78,18 @@ fun DetailScreen(
             )
         },
         content = { innerPadding ->
-            data?.let { DetailContent(data = it, modifier = Modifier.padding(innerPadding)) }
+            DetailScreen(detailsUiState = data, modifier = Modifier.padding(innerPadding))
         }
     )
+}
+
+@Composable
+fun DetailScreen(detailsUiState: DetailsUiState, modifier: Modifier) {
+    when {
+        detailsUiState.loading -> Loading()
+        detailsUiState.puppyData != null -> DetailContent(data = detailsUiState.puppyData, modifier)
+        detailsUiState.error != null -> Text(text = stringResource(R.string.general_error))
+    }
 }
 
 @Composable
@@ -86,26 +100,29 @@ fun DetailContent(data: PuppyData, modifier: Modifier = Modifier) {
         modifier = modifier
             .fillMaxSize()
             .verticalScroll(scrollState)
-            .padding(16.dp)
+            .padding(dimensionResource(id = R.dimen.large_padding))
     ) {
         Image(
             painter = painterResource(id = data.imageRes),
             contentDescription = data.breed,
             modifier = Modifier
-                .height(200.dp)
+                .aspectRatio(1.0f)
                 .fillMaxWidth()
-                .clip(shape = RoundedCornerShape(4.dp)),
+                .clip(shape = RoundedCornerShape(dimensionResource(id = R.dimen.corner_radius))),
             contentScale = ContentScale.Crop
         )
         Text(
             data.breed,
             style = typography.h6,
-            modifier = Modifier.padding(top = 16.dp, bottom = 16.dp)
+            modifier = Modifier.padding(
+                top = dimensionResource(id = R.dimen.large_padding),
+                bottom = dimensionResource(id = R.dimen.large_padding)
+            )
         )
         Text(
             data.description,
             style = typography.body2,
-            modifier = Modifier.padding(bottom = 16.dp)
+            modifier = Modifier.padding(bottom = dimensionResource(id = R.dimen.large_padding))
         )
         AdoptButton()
     }
@@ -122,5 +139,19 @@ fun AdoptButton(modifier: Modifier = Modifier) {
                 Text(text = stringResource(R.string.adopt))
             }
         }
+    }
+}
+
+@ExperimentalAnimationApi
+@Preview("Details screen")
+@Preview("Details screen (dark)", uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Preview("Details screen (big font)", fontScale = 1.5f)
+@Composable
+fun PreviewHomeScreen() {
+    MyTheme {
+        val data = runBlocking {
+            (FakePuppyRepository().fetchPuppyData(DataSource.data.first().id) as Result.Success).data
+        }
+        DetailContent(data = data)
     }
 }

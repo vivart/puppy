@@ -22,48 +22,57 @@ import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.navArgument
-import androidx.navigation.compose.navigate
 import androidx.navigation.compose.rememberNavController
-import com.example.androiddevchallenge.data.Repository
+import androidx.navigation.navArgument
 import com.example.androiddevchallenge.ui.detail.DetailScreen
+import com.example.androiddevchallenge.ui.detail.DetailViewModel
 import com.example.androiddevchallenge.ui.home.HomeScreen
+import org.koin.androidx.compose.getStateViewModel
 
-object MainDestinations {
-    const val HOME = "home"
-    const val DETAIL = "detail/{id}"
-    const val DETAIL_ARG = "id"
+/**
+ * List of screens
+ */
+sealed class Screen(val route: String) {
+    object Home : Screen("home")
+    object Detail : Screen("detail/{id}") {
+        fun createRoute(id: String) = "detail/$id"
+        const val NAV_ARG = "id"
+    }
 }
 
 @ExperimentalAnimationApi
 @Composable
-fun NavGraph(repository: Repository) {
+fun NavGraph() {
     val navController = rememberNavController()
     val actions = remember(navController) { MainActions(navController) }
-    NavHost(navController, startDestination = MainDestinations.HOME) {
-        composable(MainDestinations.HOME) {
+    NavHost(navController, startDestination = Screen.Home.route) {
+        composable(Screen.Home.route) {
             HomeScreen(
-                repository = repository,
-                onNext = actions.navigateToDetails
+                navigateToDetail = actions.navigateToDetails
             )
         }
         composable(
-            MainDestinations.DETAIL,
+            Screen.Detail.route,
             arguments = listOf(
-                navArgument(MainDestinations.DETAIL_ARG) {
+                navArgument(Screen.Detail.NAV_ARG) {
                     type = NavType.StringType
                 }
             )
         ) { backStackEntry ->
-            val id = backStackEntry.arguments?.getString(MainDestinations.DETAIL_ARG)
-            id?.let { DetailScreen(id = id, repository = repository, onBack = actions.goBack) }
+            backStackEntry.arguments?.let {
+                val viewModel: DetailViewModel = getStateViewModel(state = { it })
+                DetailScreen(
+                    detailViewModel = viewModel,
+                    onBack = actions.goBack
+                )
+            }
         }
     }
 }
 
 class MainActions(navController: NavHostController) {
     val navigateToDetails: (id: String) -> Unit = {
-        navController.navigate("detail/$it")
+        navController.navigate(Screen.Detail.createRoute(it))
     }
     val goBack: () -> Unit = {
         navController.popBackStack()

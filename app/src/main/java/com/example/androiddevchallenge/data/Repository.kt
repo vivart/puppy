@@ -16,6 +16,7 @@
 package com.example.androiddevchallenge.data
 
 interface Repository {
-    fun getAllPuppyData(): List<PuppyData>
+    suspend fun fetchAllPuppyData(): Result<List<PuppyData>>
     fun getPuppyData(id: String): PuppyData
+    suspend fun fetchPuppyData(id: String): Result<PuppyData>
 }

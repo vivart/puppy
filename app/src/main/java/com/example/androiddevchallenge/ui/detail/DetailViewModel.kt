@@ -15,31 +15,51 @@
  */
 package com.example.androiddevchallenge.ui.detail
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import com.example.androiddevchallenge.data.PuppyData
 import com.example.androiddevchallenge.data.Repository
+import com.example.androiddevchallenge.data.Result
+import com.example.androiddevchallenge.ui.Screen
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
-class DetailViewModel(id: String, repository: Repository) : ViewModel() {
-    private val _data: MutableLiveData<PuppyData> by lazy {
-        MutableLiveData<PuppyData>().apply {
-            value = repository.getPuppyData(id)
-        }
-    }
-    val data: LiveData<PuppyData> = _data
-}
+data class DetailsUiState(
+    val loading: Boolean = false,
+    val puppyData: PuppyData? = null,
+    val error: String? = null
+)
 
-class DetailViewModelFactory(
-    private val id: String,
+class DetailViewModel(
+    savedStateHandle: SavedStateHandle,
     private val repository: Repository
-) :
-    ViewModelProvider.Factory {
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(DetailViewModel::class.java)) {
-            return DetailViewModel(id, repository) as T
+) : ViewModel() {
+    private val id: String =
+        savedStateHandle.get(Screen.Detail.NAV_ARG) ?: error("id must be available")
+    private val _uiState = MutableStateFlow(DetailsUiState(loading = true))
+    val uiState: StateFlow<DetailsUiState> = _uiState.asStateFlow()
+
+    init {
+        fetchPuppyData()
+    }
+
+    private fun fetchPuppyData() {
+        _uiState.update { it.copy(loading = true) }
+        viewModelScope.launch {
+            val result = repository.fetchPuppyData(id)
+            _uiState.update {
+                when (result) {
+                    is Result.Success -> it.copy(puppyData = result.data, loading = false)
+                    is Result.Error -> it.copy(
+                        error = result.exception.localizedMessage,
+                        loading = false
+                    )
+                }
+            }
         }
-        throw IllegalArgumentException("Unknown ViewModel class")
     }
 }
