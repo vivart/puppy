@@ -25,6 +25,7 @@ import androidx.compose.runtime.Composable
 import com.example.androiddevchallenge.ui.NavGraph
 import com.example.androiddevchallenge.ui.theme.MyTheme
 
+@ExperimentalAnimationApi
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,7 +37,7 @@ class MainActivity : AppCompatActivity() {
     }
 }
 
-@OptIn(ExperimentalAnimationApi::class)
+@ExperimentalAnimationApi
 @Composable
 fun MyApp() {
     Surface(color = MaterialTheme.colors.background) {

@@ -8,8 +8,8 @@ Puppy adoption app is a simple android app which is developed using jetpack comp
 
 ## :bulb: Motivation and Context
 - App is using jetpack compose and there is no layout xml used in this app.
-- I have also tried using few more components like compose navigation, viewmodel and livedata.
-- in future I am planing to add hilt too but for now I am using a container for repository injection.
+- I have also tried using few more components like compose navigation, viewmodel and stateflow.
+- I am using Koin for DI
 - I have used hard coded puppy related data.
 
 ## :camera_flash: Screenshots
