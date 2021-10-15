@@ -34,12 +34,12 @@ import org.junit.runner.RunWith
  * See [testing documentation](http://d.android.com/tools/testing).
  */
 @RunWith(AndroidJUnit4::class)
+@ExperimentalAnimationApi
 class ExampleInstrumentedTest {
     @get:Rule
     val composeTestRule = createAndroidComposeRule<MainActivity>()
     private val repository = FakePuppyRepository()
 
-    @ExperimentalAnimationApi
     @Test
     fun homeScreenTest() {
         composeTestRule.setContent {
