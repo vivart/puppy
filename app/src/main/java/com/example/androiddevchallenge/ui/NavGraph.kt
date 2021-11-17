@@ -16,6 +16,7 @@
 package com.example.androiddevchallenge.ui
 
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.navigation.NavHostController
@@ -40,6 +41,7 @@ sealed class Screen(val route: String) {
     }
 }
 
+@ExperimentalMaterial3Api
 @ExperimentalAnimationApi
 @Composable
 fun NavGraph() {

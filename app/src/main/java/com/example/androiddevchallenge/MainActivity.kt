@@ -15,28 +15,35 @@
  */
 package com.example.androiddevchallenge
 
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.compose.setContent
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import com.example.androiddevchallenge.ui.NavGraph
-import com.example.androiddevchallenge.ui.theme.MyTheme
+import com.example.androiddevchallenge.ui.theme.AppTheme
 
+@ExperimentalMaterial3Api
 @ExperimentalAnimationApi
 class MainActivity : AppCompatActivity() {
+
+    @RequiresApi(Build.VERSION_CODES.S)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            MyTheme {
+            AppTheme {
                 MyApp()
             }
         }
     }
 }
 
+@ExperimentalMaterial3Api
 @ExperimentalAnimationApi
 @Composable
 fun MyApp() {

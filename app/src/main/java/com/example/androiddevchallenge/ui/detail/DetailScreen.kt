@@ -16,6 +16,8 @@
 package com.example.androiddevchallenge.ui.detail
 
 import android.content.res.Configuration
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
@@ -26,15 +28,16 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Button
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
-import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SmallTopAppBar
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -54,9 +57,10 @@ import com.example.androiddevchallenge.data.FakePuppyRepository
 import com.example.androiddevchallenge.data.PuppyData
 import com.example.androiddevchallenge.data.Result
 import com.example.androiddevchallenge.ui.components.Loading
-import com.example.androiddevchallenge.ui.theme.MyTheme
+import com.example.androiddevchallenge.ui.theme.AppTheme
 import kotlinx.coroutines.runBlocking
 
+@ExperimentalMaterial3Api
 @Composable
 fun DetailScreen(
     detailViewModel: DetailViewModel,
@@ -65,7 +69,7 @@ fun DetailScreen(
     val data by detailViewModel.uiState.collectAsState()
     Scaffold(
         topBar = {
-            TopAppBar(
+            SmallTopAppBar(
                 title = { Text(data.puppyData?.breed ?: stringResource(R.string.title)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
@@ -113,7 +117,7 @@ fun DetailContent(data: PuppyData, modifier: Modifier = Modifier) {
         )
         Text(
             data.breed,
-            style = typography.h6,
+            style = typography.headlineLarge,
             modifier = Modifier.padding(
                 top = dimensionResource(id = R.dimen.large_padding),
                 bottom = dimensionResource(id = R.dimen.large_padding)
@@ -121,7 +125,7 @@ fun DetailContent(data: PuppyData, modifier: Modifier = Modifier) {
         )
         Text(
             data.description,
-            style = typography.body2,
+            style = typography.bodyLarge,
             modifier = Modifier.padding(bottom = dimensionResource(id = R.dimen.large_padding))
         )
         AdoptButton()
@@ -142,13 +146,14 @@ fun AdoptButton(modifier: Modifier = Modifier) {
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.S)
 @ExperimentalAnimationApi
 @Preview("Details screen")
 @Preview("Details screen (dark)", uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Preview("Details screen (big font)", fontScale = 1.5f)
 @Composable
 fun PreviewHomeScreen() {
-    MyTheme {
+    AppTheme {
         val data = runBlocking {
             (FakePuppyRepository().fetchPuppyData(DataSource.data.first().id) as Result.Success).data
         }

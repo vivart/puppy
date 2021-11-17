@@ -16,6 +16,8 @@
 package com.example.androiddevchallenge.ui.home
 
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.fadeIn
@@ -34,13 +36,18 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.Card
-import androidx.compose.material.FloatingActionButton
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
-import androidx.compose.material.TopAppBar
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SmallTopAppBar
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
@@ -62,13 +69,14 @@ import com.example.androiddevchallenge.data.FakePuppyRepository
 import com.example.androiddevchallenge.data.PuppyData
 import com.example.androiddevchallenge.data.Result
 import com.example.androiddevchallenge.ui.components.Loading
-import com.example.androiddevchallenge.ui.theme.MyTheme
+import com.example.androiddevchallenge.ui.theme.AppTheme
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.koin.androidx.compose.getViewModel
 
+@ExperimentalMaterial3Api
 @ExperimentalAnimationApi
 @Composable
 fun HomeScreen(
@@ -78,7 +86,7 @@ fun HomeScreen(
     val uiState by homeViewModel.uiState.collectAsState()
     Scaffold(
         topBar = {
-            TopAppBar(
+            SmallTopAppBar(
                 title = { Text(stringResource(R.string.title)) },
             )
         },
@@ -175,11 +183,12 @@ fun ScrollToTopButton(onClick: () -> Unit) {
 @Composable
 fun HomeListItem(puppyData: PuppyData, onClick: () -> Unit) {
     val typography = MaterialTheme.typography
-    Card(
+    Surface(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick),
-        elevation = 8.dp
+        tonalElevation = 8.dp,
+        shadowElevation = 8.dp
     ) {
         Row(
             modifier = Modifier.padding(16.dp),
@@ -197,11 +206,11 @@ fun HomeListItem(puppyData: PuppyData, onClick: () -> Unit) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Text(
                     puppyData.breed,
-                    style = typography.h6
+                    style = typography.headlineSmall
                 )
                 Text(
                     puppyData.description,
-                    style = typography.body2,
+                    style = typography.bodyMedium,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis
                 )
@@ -210,13 +219,14 @@ fun HomeListItem(puppyData: PuppyData, onClick: () -> Unit) {
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.S)
 @ExperimentalAnimationApi
 @Preview("Home screen")
 @Preview("Home screen (dark)", uiMode = UI_MODE_NIGHT_YES)
 @Preview("Home screen (big font)", fontScale = 1.5f)
 @Composable
 fun PreviewHomeScreen() {
-    MyTheme {
+    AppTheme {
         val data = runBlocking {
             (FakePuppyRepository().fetchAllPuppyData() as Result.Success).data
         }
