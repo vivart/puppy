@@ -3,6 +3,8 @@ plugins {
     id 'kotlin-android'
 }
 apply plugin: 'kotlin-android'
+apply plugin: 'com.google.gms.google-services'
+apply plugin: 'com.google.firebase.appdistribution'
 
 android {
     compileSdkVersion 31
@@ -81,6 +83,7 @@ dependencies {
     implementation "io.insert-koin:koin-androidx-compose:3.1.2"
     implementation "androidx.constraintlayout:constraintlayout-compose:1.0.0-rc01"
     implementation "androidx.compose.material3:material3:1.0.0-alpha01"
+    implementation platform('com.google.firebase:firebase-bom:29.0.0')
     testImplementation 'junit:junit:4.13.2'
 
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
