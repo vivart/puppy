@@ -13,8 +13,8 @@ android {
         applicationId "com.example.androiddevchallenge"
         minSdkVersion 23
         targetSdkVersion 31
-        versionCode 1
-        versionName "1.0"
+        versionCode rootProject.ext.commitCount()
+        versionName rootProject.ext.versionName
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -38,6 +38,7 @@ android {
     buildTypes {
         debug {
             signingConfig signingConfigs.debug
+            applicationIdSuffix = ".debug"
         }
         release {
             debuggable false

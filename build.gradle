@@ -18,6 +18,19 @@ buildscript {
     ext.kotlin_version = '1.5.31'
     ext.compose_version = '1.0.5'
     ext.coroutines_version = '1.4.2'
+    ext.commitCount = {
+        def stdOut = new ByteArrayOutputStream()
+        exec {
+            commandLine "git", "rev-list", "--count", "HEAD"
+            standardOutput = stdOut
+        }
+        return Integer.valueOf(stdOut.toString().trim())
+    }
+    ext {
+        final VERSION_MAJOR = 1
+        final VERSION_MINOR = 0
+        versionName = "${VERSION_MAJOR}.${VERSION_MINOR}.${commitCount()}"
+    }
 
     repositories {
         google()

@@ -30,8 +30,13 @@ jobs:
 
       - name: Decode debug google-services.json
         env:
-          FIREBASE_SECRET: ${{ secrets.FIREBASE_GOOGLE_SERVICE }}
-        run: echo $FIREBASE_SECRET > app/google-services.json
+          FIREBASE_SECRET: ${{ secrets.FIREBASE_GOOGLE_SERVICE_DEBUG }}
+        run: echo $FIREBASE_SECRET > app/src/debug/google-services.json
+
+      - name: Decode debug google-services.json
+        env:
+          FIREBASE_SECRET: ${{ secrets.FIREBASE_GOOGLE_SERVICE_RELEASE }}
+        run: echo $FIREBASE_SECRET > app/src/release/google-services.json
 
       - name: Check spotless
         run: ./gradlew spotlessCheck --stacktrace
@@ -56,7 +61,7 @@ jobs:
           RELEASE_KEYSTORE_PASSWORD: ${{ secrets.RELEASE_PASSWORD }}
           RELEASE_KEY_PASSWORD: ${{ secrets.RELEASE_PASSWORD }}
 
-      - name: Upload artifact to Firebase App Distribution
+      - name: Upload debug artifact to Firebase App Distribution
         uses: wzieba/Firebase-Distribution-Github-Action@v1
         with:
           appId: ${{secrets.FIREBASE_APP_ID}}
@@ -64,7 +69,7 @@ jobs:
           groups: test-team
           file: app/build/outputs/apk/debug/app-debug.apk
 
-      - name: Upload artifact to Firebase App Distribution
+      - name: Upload release artifact to Firebase App Distribution
         uses: wzieba/Firebase-Distribution-Github-Action@v1
         with:
           appId: ${{secrets.FIREBASE_APP_ID}}
@@ -107,8 +112,13 @@ jobs:
 
       - name: Decode debug google-services.json
         env:
-          FIREBASE_SECRET: ${{ secrets.FIREBASE_GOOGLE_SERVICE }}
-        run: echo $FIREBASE_SECRET > app/google-services.json
+          FIREBASE_SECRET: ${{ secrets.FIREBASE_GOOGLE_SERVICE_DEBUG }}
+        run: echo $FIREBASE_SECRET > app/src/debug/google-services.json
+
+      - name: Decode debug google-services.json
+        env:
+          FIREBASE_SECRET: ${{ secrets.FIREBASE_GOOGLE_SERVICE_RELEASE }}
+        run: echo $FIREBASE_SECRET > app/src/release/google-services.json
 
       - name: Run instrumentation tests
         uses: reactivecircus/android-emulator-runner@v2
