@@ -22,13 +22,39 @@ jobs:
         with:
           java-version: 11
 
+      - name: Recover Gradle cache
+        uses: actions/cache@v1
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
+
       - name: Decode debug google-services.json
         env:
           FIREBASE_SECRET: ${{ secrets.FIREBASE_GOOGLE_SERVICE }}
         run: echo $FIREBASE_SECRET > app/google-services.json
 
-      - name: Build project
-        run: ./gradlew spotlessCheck assembleDebug lintDebug --stacktrace
+      - name: Check spotless
+        run: ./gradlew spotlessCheck --stacktrace
+
+      - name: Check spotless
+          run: ./gradlew lintDebug --stacktrace
+
+      - name: Build debug
+          run: ./gradlew assembleDebug --stacktrace
+
+      - name: Decode release certificate
+        id: release_cert
+        uses: timheuer/base64-to-file@v1.0.3
+        with:
+          fileName: 'upload-keystore.jks'
+          encodedString: ${{ secrets.RELEASE_KEYSTORE_BASE64 }}
+
+      - name: Build release
+        run: ./gradlew assembleRelease
+        env:
+          RELEASE_KEYSTORE_PATH: ${{ steps.release_cert.outputs.filePath }}
+          RELEASE_KEYSTORE_PASSWORD: ${{ secrets.RELEASE_PASSWORD }}
+          RELEASE_KEY_PASSWORD: ${{ secrets.RELEASE_PASSWORD }}
 
       - name: Upload artifact to Firebase App Distribution
         uses: wzieba/Firebase-Distribution-Github-Action@v1
@@ -37,6 +63,14 @@ jobs:
           token: ${{secrets.FIREBASE_TOKEN}}
           groups: test-team
           file: app/build/outputs/apk/debug/app-debug.apk
+
+      - name: Upload artifact to Firebase App Distribution
+        uses: wzieba/Firebase-Distribution-Github-Action@v1
+        with:
+          appId: ${{secrets.FIREBASE_APP_ID}}
+          token: ${{secrets.FIREBASE_TOKEN}}
+          groups: test-team
+          file: app/build/outputs/apk/release/app-release.apk
 
       - name: Upload build outputs (APKs)
         uses: actions/upload-artifact@v2
