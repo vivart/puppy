@@ -108,7 +108,7 @@ jobs:
       - name: Decode google-services.json
         env:
           FIREBASE_SECRET: ${{ secrets.FIREBASE_GOOGLE_SERVICE }}
-        run: echo $FIREBASE_SECRET > app/src/debug/google-services.json
+        run: echo $FIREBASE_SECRET > app/google-services.json
 
       - name: Run instrumentation tests
         uses: reactivecircus/android-emulator-runner@v2
