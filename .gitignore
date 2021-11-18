@@ -35,6 +35,4 @@ proguard-project.txt
 *.iml
 .idea
 
-app/src/debug/google-services.json
-app/src/release/google-services.json
 app/release
