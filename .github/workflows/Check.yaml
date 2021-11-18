@@ -28,15 +28,10 @@ jobs:
           path: ~/.gradle/caches
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
 
-      - name: Decode debug google-services.json
+      - name: Decode google-services.json
         env:
-          FIREBASE_SECRET_DEBUG: ${{ secrets.FIREBASE_GOOGLE_SERVICE_DEBUG }}
-        run: echo $FIREBASE_SECRET_DEBUG > app/src/debug/google-services.json
-
-      - name: Decode debug google-services.json
-        env:
-          FIREBASE_SECRET_RELEASE: ${{ secrets.FIREBASE_GOOGLE_SERVICE_RELEASE }}
-        run: echo $FIREBASE_SECRET_RELEASE > app/src/release/google-services.json
+          FIREBASE_SECRET: ${{ secrets.FIREBASE_GOOGLE_SERVICE }}
+        run: echo $FIREBASE_SECRET > app/google-services.json
 
       - name: Check spotless
         run: ./gradlew spotlessCheck --stacktrace
@@ -110,15 +105,10 @@ jobs:
         with:
           java-version: 11
 
-      - name: Decode debug google-services.json
+      - name: Decode google-services.json
         env:
-          FIREBASE_SECRET: ${{ secrets.FIREBASE_GOOGLE_SERVICE_DEBUG }}
+          FIREBASE_SECRET: ${{ secrets.FIREBASE_GOOGLE_SERVICE }}
         run: echo $FIREBASE_SECRET > app/src/debug/google-services.json
-
-      - name: Decode debug google-services.json
-        env:
-          FIREBASE_SECRET: ${{ secrets.FIREBASE_GOOGLE_SERVICE_RELEASE }}
-        run: echo $FIREBASE_SECRET > app/src/release/google-services.json
 
       - name: Run instrumentation tests
         uses: reactivecircus/android-emulator-runner@v2
