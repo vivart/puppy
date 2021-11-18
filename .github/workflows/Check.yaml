@@ -37,10 +37,10 @@ jobs:
         run: ./gradlew spotlessCheck --stacktrace
 
       - name: Check spotless
-          run: ./gradlew lintDebug --stacktrace
+        run: ./gradlew lintDebug --stacktrace
 
       - name: Build debug
-          run: ./gradlew assembleDebug --stacktrace
+        run: ./gradlew assembleDebug --stacktrace
 
       - name: Decode release certificate
         id: release_cert
