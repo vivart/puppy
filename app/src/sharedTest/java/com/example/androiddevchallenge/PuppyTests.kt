@@ -17,17 +17,17 @@ package com.example.androiddevchallenge
 
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.example.androiddevchallenge.data.DataSource
-import com.example.androiddevchallenge.data.FakePuppyRepository
 import com.example.androiddevchallenge.ui.detail.DetailContent
 import com.example.androiddevchallenge.ui.home.HomeContent
-import com.example.androiddevchallenge.ui.theme.AppTheme
+import org.junit.After
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.koin.core.context.GlobalContext.stopKoin
 
 /**
  * Instrumented test, which will execute on an Android device.
@@ -36,19 +36,16 @@ import org.junit.runner.RunWith
  */
 @RunWith(AndroidJUnit4::class)
 @ExperimentalAnimationApi
-class ExampleInstrumentedTest {
+class PuppyTests {
     @ExperimentalMaterial3Api
     @get:Rule
-    val composeTestRule = createAndroidComposeRule<MainActivity>()
-    private val repository = FakePuppyRepository()
+    val composeTestRule = createComposeRule()
 
     @ExperimentalMaterial3Api
     @Test
     fun homeScreenTest() {
         composeTestRule.setContent {
-            AppTheme {
-                HomeContent(list = DataSource.data, onNext = {})
-            }
+            HomeContent(list = DataSource.data, onNext = {})
         }
         composeTestRule.onNodeWithText(
             text = DataSource.data.first().breed,
@@ -60,14 +57,17 @@ class ExampleInstrumentedTest {
     @Test
     fun detailScreenTest() {
         composeTestRule.setContent {
-            AppTheme {
-                DetailContent(data = DataSource.data.first())
-            }
+            DetailContent(data = DataSource.data.first())
         }
 
         composeTestRule.onNodeWithText(
             text = "Adopt",
             substring = true
         ).assertExists()
+    }
+
+    @After
+    fun tearDown() {
+        stopKoin()
     }
 }

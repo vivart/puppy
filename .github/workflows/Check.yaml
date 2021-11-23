@@ -36,7 +36,7 @@ jobs:
       - name: Check spotless
         run: ./gradlew spotlessCheck --stacktrace
 
-      - name: Check spotless
+      - name: Check lint
         run: ./gradlew lintDebug --stacktrace
 
       - name: Build debug
@@ -50,7 +50,7 @@ jobs:
           encodedString: ${{ secrets.RELEASE_KEYSTORE_BASE64 }}
 
       - name: Build release
-        run: ./gradlew assembleRelease
+        run: ./gradlew assembleRelease --stacktrace
         env:
           RELEASE_KEYSTORE_PATH: ${{ steps.release_cert.outputs.filePath }}
           RELEASE_KEYSTORE_PASSWORD: ${{ secrets.RELEASE_PASSWORD }}
@@ -72,6 +72,9 @@ jobs:
           groups: test-team
           file: app/build/outputs/apk/release/app-release.apk
 
+      - name: Run local tests
+        run: ./gradlew testDebug --stacktrace
+
       - name: Upload build outputs (APKs)
         uses: actions/upload-artifact@v2
         with:
@@ -85,7 +88,7 @@ jobs:
           name: build-reports
           path: app/build/reports
 
-  test:
+  androidTest:
     needs: build
     runs-on: macOS-latest # enables hardware acceleration in the virtual machine
     timeout-minutes: 30
@@ -123,4 +126,4 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: test-reports
-          path: app/build/reports
+          path: app/build/reports/androidTests
